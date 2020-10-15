@@ -19,6 +19,7 @@ spec:
       containers:
         - name: recolhe-eco-api
           image: recolheeco/api:latest
+          imagePullPolicy: Always
           ports:
             - name: http
               containerPort: 3000
