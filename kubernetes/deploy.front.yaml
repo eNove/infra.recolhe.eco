@@ -1,0 +1,64 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recolhe-eco-front-deployment
+  namespace: recolhe-eco
+  labels:
+    name: recolhe-eco-front
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: recolhe-eco-front
+  template:
+    metadata:
+      labels:
+        name: recolhe-eco-front
+    spec:
+      containers:
+        - name: recolhe-eco-front
+          image: recolheeco/front:latest
+          ports:
+            - name: http
+              containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: recolhe-eco-front
+  name: recolhe-eco-front-service
+  namespace: recolhe-eco
+spec:
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: http
+  selector:
+    name: recolhe-eco-front
+  type: ClusterIP
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: recolhe-eco-front-ingress
+  namespace: recolhe-eco
+spec:
+  entryPoints:
+    - web
+  routes:
+    - kind: Rule
+      match: (Host(`recolhe.eco`) || Host(`www.recolhe.eco`)) && PathPrefix(`/`)
+      services:
+        - kind: Service
+          name: recolhe-eco-front-service
+          namespace: recolhe-eco
+          passHostHeader: true
+          port: 80
+          responseForwarding:
+            flushInterval: 1ms
+          scheme: http
+          strategy: RoundRobin
+          weight: 10
