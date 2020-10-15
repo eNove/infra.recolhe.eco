@@ -51,7 +51,7 @@ spec:
     - web
   routes:
     - kind: Rule
-      match: (Host(`recolhe.eco`) || Host(`www.recolhe.eco`)) && PathPrefix(`/`)
+      match: (Host(`recolhe.eco`) || Host(`www.recolhe.eco`) || Host(`recolhe.eco.br`) || Host(`www.recolhe.eco.br`)) && PathPrefix(`/`)
       services:
         - kind: Service
           name: recolhe-eco-front-service
