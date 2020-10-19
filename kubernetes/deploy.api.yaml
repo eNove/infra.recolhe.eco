@@ -41,25 +41,41 @@ spec:
     name: recolhe-eco-api
   type: ClusterIP
 ---
-apiVersion: traefik.containo.us/v1alpha1
-kind: IngressRoute
+apiVersion: extensions/v1beta1
+kind: Ingress
 metadata:
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
   name: recolhe-eco-api-ingress
   namespace: recolhe-eco
 spec:
-  entryPoints:
-    - web
-  routes:
-    - kind: Rule
-      match: Host(`api.recolhe.eco`) && PathPrefix(`/`)
-      services:
-        - kind: Service
-          name: recolhe-eco-api-service
-          namespace: recolhe-eco
-          passHostHeader: true
-          port: 80
-          responseForwarding:
-            flushInterval: 1ms
-          scheme: http
-          strategy: RoundRobin
-          weight: 10
+  rules:
+  - host: api.recolhe.eco
+    http:
+      paths:
+      - backend:
+          serviceName: recolhe-eco-api-service
+          servicePort: 80
+# ---
+# apiVersion: traefik.containo.us/v1alpha1
+# kind: IngressRoute
+# metadata:
+#   name: recolhe-eco-api-ingressroute
+#   namespace: recolhe-eco
+# spec:
+#   entryPoints:
+#     - web
+#   routes:
+#     - kind: Rule
+#       match: Host(`api.recolhe.eco`) && PathPrefix(`/`)
+#       services:
+#         - kind: Service
+#           name: recolhe-eco-api-service
+#           namespace: recolhe-eco
+#           passHostHeader: true
+#           port: 80
+#           responseForwarding:
+#             flushInterval: 1ms
+#           scheme: http
+#           strategy: RoundRobin
+#           weight: 10

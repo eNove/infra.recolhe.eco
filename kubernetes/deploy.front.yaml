@@ -41,25 +41,57 @@ spec:
     name: recolhe-eco-front
   type: ClusterIP
 ---
-apiVersion: traefik.containo.us/v1alpha1
-kind: IngressRoute
+apiVersion: extensions/v1beta1
+kind: Ingress
 metadata:
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
   name: recolhe-eco-front-ingress
   namespace: recolhe-eco
 spec:
-  entryPoints:
-    - web
-  routes:
-    - kind: Rule
-      match: (Host(`recolhe.eco`) || Host(`www.recolhe.eco`) || Host(`recolhe.eco.br`) || Host(`www.recolhe.eco.br`)) && PathPrefix(`/`)
-      services:
-        - kind: Service
-          name: recolhe-eco-front-service
-          namespace: recolhe-eco
-          passHostHeader: true
-          port: 80
-          responseForwarding:
-            flushInterval: 1ms
-          scheme: http
-          strategy: RoundRobin
-          weight: 10
+  rules:
+  - host: recolhe.eco
+    http:
+      paths:
+      - backend:
+          serviceName: recolhe-eco-front-service
+          servicePort: 80
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+  name: recolhe-eco-front-www-ingress
+  namespace: recolhe-eco
+spec:
+  rules:
+  - host: www.recolhe.eco
+    http:
+      paths:
+      - backend:
+          serviceName: recolhe-eco-front-service
+          servicePort: 80
+# ---
+# apiVersion: traefik.containo.us/v1alpha1
+# kind: IngressRoute
+# metadata:
+#   name: recolhe-eco-front-ingressroute
+#   namespace: recolhe-eco
+# spec:
+#   entryPoints:
+#     - web
+#   routes:
+#     - kind: Rule
+#       match: (Host(`recolhe.eco`) || Host(`www.recolhe.eco`) || Host(`recolhe.eco.br`) || Host(`www.recolhe.eco.br`)) && PathPrefix(`/`)
+#       services:
+#         - kind: Service
+#           name: recolhe-eco-front-service
+#           namespace: recolhe-eco
+#           passHostHeader: true
+#           port: 80
+#           responseForwarding:
+#             flushInterval: 1ms
+#           scheme: http
+#           strategy: RoundRobin
+#           weight: 10
